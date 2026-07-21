@@ -2,7 +2,7 @@
   <div class="learn-view page-container fade-in">
     <h1 class="page-title">学习中心</h1>
     <div class="category-filters">
-      <button v-for="cat in categories" :key="cat.value" class="filter-btn" :class="{ active: store.currentCategory === cat.value }" @click="store.currentCategory = cat.value">{{ cat.label }}</button>
+      <button v-for="cat in categories" :key="cat.value" class="filter-btn" :class="{ active: store.currentCategory === cat.value }" @click="store.setCurrentCategory(cat.value)">{{ cat.label }}</button>
     </div>
     <LoadingSpinner v-if="store.isLoading" text="加载课程中..." />
     <div v-else-if="store.filteredCourses.length === 0" class="empty-wrap"><EmptyState title="暂无课程" description="该分类下还没有课程，请选择其他分类" /></div>
@@ -15,14 +15,17 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useCoursesStore } from '@/stores/courses'
-import { CATEGORY_LABELS } from '@/types'
+import { CATEGORY_LABELS, type CourseCategory } from '@/types'
 import CourseCard from '@/components/learn/CourseCard.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 
 const store = useCoursesStore()
 const progressMap = ref<Record<number, number>>({})
-const categories = [{ value: 'all', label: '全部' }, ...Object.entries(CATEGORY_LABELS).map(([value, label]) => ({ value, label }))]
+const categories: Array<{ value: CourseCategory | 'all'; label: string }> = [
+  { value: 'all', label: '全部' },
+  ...Object.entries(CATEGORY_LABELS).map(([value, label]) => ({ value: value as CourseCategory, label }))
+]
 
 onMounted(async () => {
   await store.loadCourses()

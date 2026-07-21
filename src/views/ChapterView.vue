@@ -10,8 +10,8 @@
       <div v-if="videoEmbedUrl" class="video-container">
         <iframe :src="videoEmbedUrl" frameborder="0" allowfullscreen class="video-iframe"></iframe>
       </div>
-      <div v-else-if="chapter.video_url" class="video-link-container">
-        <a :href="chapter.video_url" target="_blank" class="video-link">
+      <div v-else-if="chapter.videoUrl" class="video-link-container">
+        <a :href="chapter.videoUrl" target="_blank" class="video-link">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7l6 3-6 3V7z"/></svg>
           在 Bilibili 观看教学视频
         </a>
@@ -56,7 +56,7 @@ const allChapters = computed(() => store.getChaptersByCourseId(courseId.value))
 const prevChapter = computed(() => { const idx = allChapters.value.findIndex(c => c.id === chapterId.value); return idx > 0 ? allChapters.value[idx - 1] : null })
 const nextChapter = computed(() => { const idx = allChapters.value.findIndex(c => c.id === chapterId.value); return idx < allChapters.value.length - 1 ? allChapters.value[idx + 1] : null })
 const videoEmbedUrl = computed(() => {
-  const url = (chapter.value as any)?.video_url as string | undefined
+  const url = (chapter.value as any)?.videoUrl as string | undefined
   if (!url) return null
   const match = url.match(/\/video\/(BV[a-zA-Z0-9]+)/)
   if (match) {

@@ -12,11 +12,11 @@ import 'highlight.js/styles/github.css'
 
 const props = defineProps<{ content: string }>()
 
-const md = new MarkdownIt({
+const md: MarkdownIt = new MarkdownIt({
   html: false,
   breaks: true,
   linkify: true,
-  highlight(str: string, lang: string) {
+  highlight(str: string, lang: string): string {
     if (lang && hljs.getLanguage(lang)) {
       try {
         return `<pre class="hljs"><code>${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`

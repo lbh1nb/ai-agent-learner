@@ -43,6 +43,23 @@ export interface Chapter {
 
 export type ChapterType = 'theory' | 'practice'
 
+// 实操任务步骤（用于分步引导）
+export interface TaskStep {
+  title: string
+  description: string
+  hint: string
+}
+
+// 测试用例（用于真实代码执行验证）
+export interface TestCase {
+  name: string
+  input: any[]
+  expected: any
+  // 验证模式：equal=深度相等（默认）| contains=字符串包含 | length=数组长度 | throws=应抛出异常
+  mode?: 'equal' | 'contains' | 'length' | 'throws'
+  description?: string
+}
+
 // 实操任务
 export interface Task {
   id: number
@@ -55,9 +72,31 @@ export interface Task {
   validationValue: string
   difficulty: Difficulty
   sortOrder: number
+  // 新增字段（可选，向后兼容）
+  steps?: TaskStep[]          // 分步引导
+  testCases?: TestCase[]      // 单元测试用例
+  functionName?: string       // 需要测试的函数名
+  hint?: string               // 整体提示
+  isGuidedProject?: boolean   // 是否为综合实战引导项目
 }
 
-export type ValidationType = 'exact' | 'contains' | 'regex' | 'custom'
+export type ValidationType = 'exact' | 'contains' | 'regex' | 'custom' | 'tests'
+
+// 代码运行结果
+export interface RunResult {
+  passed: boolean
+  totalTests: number
+  passedTests: number
+  results: Array<{
+    name: string
+    passed: boolean
+    expected: string
+    actual: string
+    error?: string
+  }>
+  consoleOutput: string[]
+  error?: string
+}
 
 // 学习记录
 export interface LearningRecord {
@@ -89,6 +128,10 @@ export interface UserConfig {
   reminderEnabled: boolean
   reminderTime: string
   createdAt: string
+  // LLM 配置（用于实操实验室的 AI 助手）
+  llmApiKey?: string
+  llmBaseUrl?: string
+  llmModel?: string
 }
 
 // AI 模拟对话消息

@@ -1,7 +1,8 @@
 {
   "name": "ai-coding-learner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "AI Coding 学习软件 - 学习如何使用 Agent 编程",
+  "author": "lbh1nb",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -15,6 +16,7 @@
     "pack:mac": "vite build && electron-builder --mac dmg"
   },
   "dependencies": {
+    "@guolao/vue-monaco-editor": "^1.6.0",
     "better-sqlite3": "^11.0.0",
     "echarts": "^5.5.0",
     "highlight.js": "^11.9.0",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "@electron/rebuild": "^4.2.0",
     "@types/better-sqlite3": "^7.6.8",
+    "@types/markdown-it": "^14.1.2",
     "@vitejs/plugin-vue": "^5.0.0",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.0",

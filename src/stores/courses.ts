@@ -47,5 +47,9 @@ export const useCoursesStore = defineStore('courses', () => {
     return chapters.value.get(courseId) || []
   }
 
-  return { courses, chapters, currentCategory, isLoading, filteredCourses, loadCourses, loadChapters, getCourseById, getChaptersByCourseId }
+  function setCurrentCategory(cat: CourseCategory | 'all') {
+    currentCategory.value = cat
+  }
+
+  return { courses, chapters, currentCategory, isLoading, filteredCourses, loadCourses, loadChapters, getCourseById, getChaptersByCourseId, setCurrentCategory }
 })

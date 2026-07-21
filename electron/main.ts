@@ -38,6 +38,14 @@ function ensureUserDataPath(): void {
 
 ensureUserDataPath()
 
+// 启动日志：记录 userData 路径，便于排查 release 版本问题
+try {
+  const logPath = path.join(app.getPath('userData'), 'startup.log')
+  fs.appendFileSync(logPath, `[${new Date().toISOString()}] App started, userData=${app.getPath('userData')}, exe=${app.getPath('exe')}\n`, 'utf-8')
+} catch (e) {
+  console.error('Cannot write startup log:', e)
+}
+
 let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
@@ -67,9 +75,27 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
-  initDatabase()
+  // 数据库初始化失败不阻塞窗口创建，便于用户看到错误信息
+  let dbError: string | null = null
+  try {
+    initDatabase()
+  } catch (err) {
+    dbError = err instanceof Error ? err.message : String(err)
+    console.error('Database init failed:', err)
+  }
   registerIpcHandlers()
   createWindow()
+
+  // 如果数据库初始化失败，在窗口加载后通过 dialog 提示
+  if (dbError && mainWindow) {
+    mainWindow.webContents.on('did-finish-load', () => {
+      const { dialog } = require('electron')
+      dialog.showErrorBox(
+        '数据库初始化失败',
+        `数据库初始化出错：${dbError}\n\n请检查应用目录权限，或联系开发者。\n日志位置：${app.getPath('userData')}\\init-error.log`
+      )
+    })
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
