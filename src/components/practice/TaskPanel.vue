@@ -37,11 +37,31 @@
         <div class="step-content">
           <h4 class="step-name">{{ currentStepData.title }}</h4>
           <p class="step-desc">{{ currentStepData.description }}</p>
+
+          <!-- 预期效果 -->
+          <div v-if="currentStepData.expectedResult" class="step-expected">
+            <span class="expected-icon">✅</span>
+            <div class="expected-content">
+              <span class="expected-label">预期效果</span>
+              <span class="expected-text">{{ currentStepData.expectedResult }}</span>
+            </div>
+          </div>
+
+          <!-- 提示 -->
           <div class="step-hint" v-if="showHint">
             <span class="hint-icon">💡</span>
             <span class="hint-text">{{ currentStepData.hint }}</span>
           </div>
           <button v-else class="hint-toggle" @click="showHint = true">显示提示</button>
+
+          <!-- 参考代码 -->
+          <div v-if="currentStepData.referenceCode" class="step-reference">
+            <button class="reference-toggle" @click="showReference = !showReference">
+              {{ showReference ? ' Hide reference code' : 'View reference code' }}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" :class="{ rotated: showReference }"><path d="M6 8L2 4h8z"/></svg>
+            </button>
+            <pre v-if="showReference" class="reference-code">{{ currentStepData.referenceCode }}</pre>
+          </div>
         </div>
 
         <!-- 步骤导航 -->
@@ -81,8 +101,9 @@ defineEmits<{
 const md = new MarkdownIt({ breaks: true })
 const renderedDescription = computed(() => md.render(props.task.description))
 const showHint = ref(false)
+const showReference = ref(false)
 
-const currentStepData = computed(() => props.steps[props.currentStep] || { title: '', description: '', hint: '' })
+const currentStepData = computed(() => props.steps[props.currentStep] || { title: '', description: '', hint: '', referenceCode: '', expectedResult: '' })
 
 const difficultyLabel = computed(() => {
   const map: Record<string, string> = { easy: '简单', medium: '中等', hard: '困难' }
@@ -94,8 +115,8 @@ const difficultyClass = computed(() => {
   return map[props.task.difficulty] || 'tag-primary'
 })
 
-// 切换步骤时重置提示显示
-watch(() => props.currentStep, () => { showHint.value = false })
+// 切换步骤时重置提示和参考代码显示
+watch(() => props.currentStep, () => { showHint.value = false; showReference.value = false })
 </script>
 
 <style scoped>
@@ -127,11 +148,27 @@ watch(() => props.currentStep, () => { showHint.value = false })
 .step-content { background: var(--color-bg-card); border-radius: var(--radius-sm); padding: var(--spacing-md); margin-bottom: var(--spacing-md); }
 .step-name { font-size: var(--font-size-base); font-weight: 600; margin-bottom: var(--spacing-sm); color: var(--color-primary-dark); }
 .step-desc { font-size: var(--font-size-sm); color: var(--color-text); line-height: 1.6; margin-bottom: var(--spacing-sm); }
+
+/* 预期效果 */
+.step-expected { display: flex; gap: var(--spacing-sm); align-items: flex-start; padding: var(--spacing-sm) var(--spacing-md); background: var(--color-success-bg); border-radius: var(--radius-sm); font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm); }
+.expected-icon { flex-shrink: 0; }
+.expected-content { display: flex; flex-direction: column; gap: 2px; }
+.expected-label { font-weight: 600; color: var(--color-success); font-size: var(--font-size-xs); }
+.expected-text { color: var(--color-text); line-height: 1.5; }
+
 .step-hint, .task-hint { display: flex; gap: var(--spacing-sm); align-items: flex-start; padding: var(--spacing-sm) var(--spacing-md); background: var(--color-warning-bg); border-radius: var(--radius-sm); font-size: var(--font-size-sm); color: var(--color-text); }
 .hint-icon { flex-shrink: 0; }
 .hint-text { line-height: 1.5; }
 .hint-toggle { background: none; border: none; color: var(--color-primary); font-size: var(--font-size-sm); cursor: pointer; padding: var(--spacing-xs) 0; }
 .hint-toggle:hover { text-decoration: underline; }
+
+/* 参考代码 */
+.step-reference { margin-top: var(--spacing-sm); }
+.reference-toggle { display: flex; align-items: center; gap: var(--spacing-xs); background: none; border: none; color: var(--color-primary); font-size: var(--font-size-sm); cursor: pointer; padding: var(--spacing-xs) 0; }
+.reference-toggle:hover { text-decoration: underline; }
+.reference-toggle svg { transition: transform var(--transition-fast); }
+.reference-toggle svg.rotated { transform: rotate(180deg); }
+.reference-code { background: #1e1e1e; color: #d4d4d4; padding: var(--spacing-md); border-radius: var(--radius-sm); font-size: var(--font-size-xs); font-family: var(--font-family-mono); line-height: 1.5; overflow-x: auto; margin: var(--spacing-xs) 0 0; white-space: pre-wrap; word-break: break-word; }
 
 .step-nav { display: flex; gap: var(--spacing-sm); align-items: center; }
 .step-finish { font-size: var(--font-size-sm); color: var(--color-success); }

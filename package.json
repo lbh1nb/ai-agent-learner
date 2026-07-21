@@ -1,6 +1,6 @@
 {
   "name": "ai-coding-learner",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AI Coding 学习软件 - 学习如何使用 Agent 编程",
   "author": "lbh1nb",
   "main": "dist-electron/main.js",

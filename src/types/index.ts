@@ -28,6 +28,12 @@ export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   advanced: '高级'
 }
 
+// 章节配套资源
+export interface ChapterResource {
+  title: string
+  url: string
+}
+
 // 章节
 export interface Chapter {
   id: number
@@ -39,6 +45,7 @@ export interface Chapter {
   videoUrl: string | null
   sortOrder: number
   createdAt: string
+  resources: ChapterResource[] | null
 }
 
 export type ChapterType = 'theory' | 'practice'
@@ -48,6 +55,8 @@ export interface TaskStep {
   title: string
   description: string
   hint: string
+  referenceCode?: string      // 该步骤的参考代码示例
+  expectedResult?: string     // 该步骤完成后的预期效果
 }
 
 // 测试用例（用于真实代码执行验证）

@@ -17,6 +17,25 @@
         </a>
       </div>
       <ContentViewer :content="chapter.content" />
+
+      <!-- 配套学习资源 -->
+      <div v-if="chapter.resources && chapter.resources.length > 0" class="resources-section">
+        <h3 class="resources-title">配套学习资源</h3>
+        <div class="resources-list">
+          <a
+            v-for="(res, idx) in chapter.resources"
+            :key="idx"
+            :href="res.url"
+            target="_blank"
+            class="resource-item"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="resource-icon"><path d="M10 1H3a1 1 0 00-1 1v12a1 1 0 001 1h10a1 1 0 001-1V5l-4-4zm1 1.5L12.5 4H11V2.5zM4 13V3h5v3h3v7H4z"/></svg>
+            <span class="resource-text">{{ res.title }}</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" class="resource-external"><path d="M4 2h6v6h-1V3.7L3.7 9 3 8.3 8.3 3H4V2z"/></svg>
+          </a>
+        </div>
+      </div>
+
       <div class="chapter-footer">
         <button v-if="!isCompleted" class="btn btn-primary btn-lg" @click="markComplete">标记为已完成</button>
         <span v-else class="completed-label">
@@ -171,4 +190,14 @@ async function markComplete() {
 .video-link-container { padding: var(--spacing-xl) var(--spacing-2xl); background: var(--color-bg-card); border-bottom: 1px solid var(--color-border-light); }
 .video-link { display: flex; align-items: center; gap: var(--spacing-md); color: var(--color-primary); font-size: var(--font-size-md); font-weight: 600; text-decoration: none; }
 .video-link:hover { color: var(--color-primary-hover); text-decoration: underline; }
+
+/* 配套学习资源 */
+.resources-section { padding: var(--spacing-xl) var(--spacing-2xl); border-top: 1px solid var(--color-border-light); background: var(--color-bg-card); }
+.resources-title { font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--spacing-md); color: var(--color-text); }
+.resources-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.resource-item { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); background: var(--color-primary-bg); border-radius: var(--radius-sm); text-decoration: none; color: var(--color-text); font-size: var(--font-size-sm); transition: all var(--transition-fast); }
+.resource-item:hover { background: var(--color-primary); color: #fff; }
+.resource-icon { flex-shrink: 0; opacity: 0.7; }
+.resource-text { flex: 1; }
+.resource-external { flex-shrink: 0; opacity: 0.5; }
 </style>

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Course, Chapter, CourseCategory } from '@/types'
+import type { Course, Chapter, CourseCategory, ChapterResource } from '@/types'
 
 export const useCoursesStore = defineStore('courses', () => {
   const courses = ref<Course[]>([])
@@ -33,7 +33,12 @@ export const useCoursesStore = defineStore('courses', () => {
         'SELECT * FROM chapters WHERE course_id = ? ORDER BY sort_order',
         [courseId]
       )
-      chapters.value.set(courseId, rows)
+      // 解析 resources JSON 字段
+      const parsed = rows.map((row: any) => ({
+        ...row,
+        resources: row.resources ? (JSON.parse(row.resources) as ChapterResource[]) : null
+      })) as Chapter[]
+      chapters.value.set(courseId, parsed)
     } catch (e) {
       console.error('Failed to load chapters:', e)
     }
