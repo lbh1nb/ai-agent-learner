@@ -127,6 +127,11 @@ function createTables(): void {
       tasks_completed INTEGER DEFAULT 0,
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS app_meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
   `)
 
   // 为旧数据库添加 video_url 列（如果不存在）
@@ -148,9 +153,41 @@ function createTables(): void {
   }
 }
 
+// 种子数据版本号：每次修改 chapters/tasks/courses 种子内容时递增
+// 升级时若版本不匹配，会自动清除旧课程数据并重新填充，保留用户配置和学习时长
+const CURRENT_DATA_VERSION = '1.2.1'
+
+function getDataVersion(): string | null {
+  try {
+    const row = db.prepare("SELECT value FROM app_meta WHERE key = 'data_version'").get() as { value: string } | undefined
+    return row?.value || null
+  } catch {
+    return null
+  }
+}
+
+function setDataVersion(version: string): void {
+  db.prepare("INSERT OR REPLACE INTO app_meta (key, value) VALUES ('data_version', ?)").run(version)
+}
+
 function seedData(): void {
-  const count = db.prepare('SELECT COUNT(*) as count FROM courses').get() as { count: number }
-  if (count.count > 0) return
+  const currentVersion = getDataVersion()
+  const courseCount = db.prepare('SELECT COUNT(*) as count FROM courses').get() as { count: number }
+
+  // 情况1：版本匹配且已有数据 → 跳过（正常启动）
+  if (currentVersion === CURRENT_DATA_VERSION && courseCount.count > 0) {
+    return
+  }
+
+  // 情况2：版本不匹配或无版本记录但已有旧数据 → 升级场景，清除旧课程数据
+  // 保留 user_config（用户设置）和 learning_sessions（学习时长统计）
+  if (courseCount.count > 0) {
+    db.exec('DELETE FROM learning_records')
+    db.exec('DELETE FROM tasks')
+    db.exec('DELETE FROM chapters')
+    db.exec('DELETE FROM courses')
+    db.exec('DELETE FROM user_config WHERE id = 1')
+  }
 
   const insertCourse = db.prepare(
     'INSERT INTO courses (id, title, category, difficulty, description, sort_order) VALUES (?, ?, ?, ?, ?, ?)'
@@ -3630,6 +3667,7 @@ class AdvancedRAGAgent {
   })
 
   seed()
+  setDataVersion(CURRENT_DATA_VERSION)
 }
 
 export function getDatabase(): Database.Database {
