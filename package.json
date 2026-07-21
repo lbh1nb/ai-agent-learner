@@ -9,7 +9,10 @@
     "preview": "vite preview",
     "electron:dev": "vite",
     "electron:build": "vite build && electron-builder",
-    "pack": "vite build && electron-builder --win portable zip"
+    "icons": "node scripts/generate-icons.js",
+    "pack": "vite build && electron-builder --win portable zip",
+    "pack:linux": "vite build && electron-builder --linux AppImage deb rpm",
+    "pack:mac": "vite build && electron-builder --mac dmg"
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0",

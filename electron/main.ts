@@ -1,11 +1,42 @@
 /* electron/main.ts */
 import { app, BrowserWindow } from 'electron'
+import fs from 'fs'
 import path from 'path'
 import { initDatabase, closeDatabase } from './database'
 import { registerIpcHandlers } from './ipc-handlers'
 
-// 将 Electron 用户数据目录设置在项目内，避免沙箱限制
-app.setPath('userData', path.join(__dirname, '..', 'user-data'))
+// 确定 userData 目录：
+// 1. 开发模式：项目内 user-data/（绕过 TRAE 沙箱限制）
+// 2. 生产模式：优先系统默认路径（各平台均可写）
+//    若系统默认路径不可写（如沙箱/权限限制），回退到 exe 同级 user-data/
+function ensureUserDataPath(): void {
+  if (process.env.VITE_DEV_SERVER_URL) {
+    app.setPath('userData', path.join(__dirname, '..', 'user-data'))
+    return
+  }
+
+  // 生产模式：测试系统默认 userData 是否可写
+  const defaultPath = app.getPath('userData')
+  try {
+    if (!fs.existsSync(defaultPath)) {
+      fs.mkdirSync(defaultPath, { recursive: true })
+    }
+    // 实际写入测试
+    const testFile = path.join(defaultPath, '.write-test')
+    fs.writeFileSync(testFile, 'ok')
+    fs.unlinkSync(testFile)
+  } catch {
+    // 系统默认路径不可写，回退到 exe 旁边的 user-data（portable 模式）
+    const exeDir = path.dirname(app.getPath('exe'))
+    const fallbackPath = path.join(exeDir, 'user-data')
+    if (!fs.existsSync(fallbackPath)) {
+      fs.mkdirSync(fallbackPath, { recursive: true })
+    }
+    app.setPath('userData', fallbackPath)
+  }
+}
+
+ensureUserDataPath()
 
 let mainWindow: BrowserWindow | null = null
 
