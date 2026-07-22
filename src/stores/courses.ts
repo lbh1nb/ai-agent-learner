@@ -33,9 +33,10 @@ export const useCoursesStore = defineStore('courses', () => {
         'SELECT * FROM chapters WHERE course_id = ? ORDER BY sort_order',
         [courseId]
       )
-      // 解析 resources JSON 字段
+      // 解析 resources JSON 字段，并将数据库下划线字段映射为前端驼峰字段
       const parsed = rows.map((row: any) => ({
         ...row,
+        videoUrl: row.video_url ?? null,  // 数据库 video_url → 前端 videoUrl
         resources: row.resources ? (JSON.parse(row.resources) as ChapterResource[]) : null
       })) as Chapter[]
       chapters.value.set(courseId, parsed)
