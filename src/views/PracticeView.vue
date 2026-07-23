@@ -18,7 +18,7 @@
         </div>
         <p class="task-desc">{{ getDescriptionPreview(task) }}</p>
         <div class="task-meta">
-          <span v-if="task.isGuidedProject" class="meta-badge meta-guided">引导项目</span>
+          <span v-if="task.isGuidedProject" class="meta-badge meta-guided">引导项目</span>`n          <span v-if="task.validationType === 'guide'" class="meta-badge meta-guide">实践题</span>
           <span v-if="task.validationType === 'tests'" class="meta-badge meta-tests">{{ getTestCount(task) }} 个测试</span>
           <span v-if="task.steps && task.steps.length" class="meta-badge meta-steps">{{ task.steps.length }} 步引导</span>
         </div>
@@ -94,4 +94,5 @@ function getTestCount(task: Task): number {
 .task-status.not_started { color: var(--color-text-light); }
 .task-status.in_progress { color: var(--color-warning); }
 .task-status.completed { color: var(--color-success); }
+.meta-guide { background: var(--color-primary-bg); color: var(--color-primary); }
 </style>

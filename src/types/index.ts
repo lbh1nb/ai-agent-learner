@@ -89,7 +89,7 @@ export interface Task {
   isGuidedProject?: boolean   // 是否为综合实战引导项目
 }
 
-export type ValidationType = 'exact' | 'contains' | 'regex' | 'custom' | 'tests'
+export type ValidationType = 'exact' | 'contains' | 'regex' | 'custom' | 'tests' | 'guide'
 
 // 代码运行结果
 export interface RunResult {

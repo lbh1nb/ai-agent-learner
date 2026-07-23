@@ -91,7 +91,7 @@
 
     <div class="settings-section card">
       <h3 class="section-title">关于</h3>
-      <p class="section-desc">AI Coding Learner v1.2.2</p>
+      <p class="section-desc">AI Coding Learner v1.3.0</p>
       <p class="section-desc">一款帮助你学习 AI 编程的桌面应用</p>
     </div>
   </div>

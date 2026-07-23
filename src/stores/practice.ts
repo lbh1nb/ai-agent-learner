@@ -36,6 +36,8 @@ export const usePracticeStore = defineStore('practice', () => {
 
   // 是否为测试型任务
   const isTestTask = computed(() => currentTask.value?.validationType === 'tests')
+  // 是否为纯引导型任务（无代码运行，用户在自己的环境完成后手动标记完成）
+  const isGuideTask = computed(() => currentTask.value?.validationType === 'guide')
 
   async function loadTasks() {
     isLoading.value = true
@@ -123,7 +125,11 @@ export const usePracticeStore = defineStore('practice', () => {
     let result: RunResult | undefined
     let message = ''
 
-    if (task.validationType === 'tests') {
+    if (task.validationType === 'guide') {
+      // 纯引导型任务：用户在自己的环境完成，软件只提供题目和引导，直接标记完成
+      passed = true
+      message = '已标记为完成！你可以在自己的 Agent 环境中继续实践。'
+    } else if (task.validationType === 'tests') {
       // 通过 Web Worker 执行测试
       isRunning.value = true
       try {
@@ -249,7 +255,7 @@ export const usePracticeStore = defineStore('practice', () => {
     // 计算属性
     currentSteps,
     currentTestCases,
-    isTestTask,
+    isTestTask, isGuideTask,
     // 方法
     loadTasks,
     loadTask,

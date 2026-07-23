@@ -12,7 +12,7 @@ export default defineConfig({
         entry: 'electron/main.ts',
         vite: {
           build: {
-            outDir: 'dist-electron',
+            outDir: 'app-electron',
             rollupOptions: {
               external: ['better-sqlite3']
             }
@@ -26,13 +26,16 @@ export default defineConfig({
         },
         vite: {
           build: {
-            outDir: 'dist-electron'
+            outDir: 'app-electron'
           }
         }
       }
     ]),
     renderer()
   ],
+  build: {
+    outDir: 'app-dist'
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')

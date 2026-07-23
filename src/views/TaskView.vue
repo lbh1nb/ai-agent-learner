@@ -1,8 +1,24 @@
 <template>
   <div class="task-view fade-in" v-if="store.currentTask">
-    <!-- 左侧：代码编辑器 -->
+    <!-- 左侧：代码编辑器（guide 模式下显示实践说明） -->
     <div class="task-editor-panel">
+      <div v-if="store.isGuideTask" class="guide-practice-panel">
+        <div class="guide-practice-header">
+          <h3>实践说明</h3>
+          <span class="tag tag-primary">在自己的环境完成</span>
+        </div>
+        <div class="guide-practice-body">
+          <p>这是一个<strong>实践型题目</strong>，请在自己的 Agent 开发环境中完成。</p>
+          <p>软件提供题目描述、分步引导和参考思路，但不包含在线代码运行和自动测试。</p>
+          <p>完成后点击右下角"标记完成"按钮即可。</p>
+          <div v-if="store.currentTask.initialCode" class="guide-reference-code">
+            <h4>参考代码模板</h4>
+            <pre><code>{{ store.currentTask.initialCode }}</code></pre>
+          </div>
+        </div>
+      </div>
       <CodeEditor
+        v-else
         v-model="store.userCode"
         :initial-code="store.currentTask.initialCode"
         @reset="handleReset"
@@ -83,9 +99,10 @@
 
       <!-- 固定底部操作栏 -->
       <div class="task-actions-bar">
-        <button class="btn btn-outline" @click="handleSave" :disabled="store.isRunning">保存代码</button>
+        <button v-if="!store.isGuideTask" class="btn btn-outline" @click="handleSave" :disabled="store.isRunning">保存代码</button>
         <button class="btn btn-primary" @click="handleSubmit" :disabled="store.isRunning">
-          {{ store.isRunning ? '运行中...' : '运行测试' }}
+          <template v-if="store.isGuideTask">标记完成</template>
+          <template v-else>{{ store.isRunning ? '运行中...' : '运行测试' }}</template>
         </button>
       </div>
     </div>
@@ -229,4 +246,16 @@ async function handleSend(content: string) {
 .result-title { font-size: var(--font-size-xl); margin-bottom: var(--spacing-sm); }
 .result-message { color: var(--color-text-secondary); margin-bottom: var(--spacing-xl); }
 .result-actions { display: flex; gap: var(--spacing-md); justify-content: center; }
+
+/* guide 模式实践说明面板 */
+.guide-practice-panel { padding: var(--spacing-xl); height: 100%; overflow-y: auto; background: var(--color-bg-card); }
+.guide-practice-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-lg); padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--color-border-light); }
+.guide-practice-header h3 { font-size: var(--font-size-lg); font-weight: 600; color: var(--color-text); margin: 0; }
+.guide-practice-body { color: var(--color-text-secondary); line-height: 1.8; }
+.guide-practice-body p { margin-bottom: var(--spacing-md); }
+.guide-practice-body strong { color: var(--color-primary); }
+.guide-reference-code { margin-top: var(--spacing-xl); padding: var(--spacing-md); background: #1e1e1e; border-radius: var(--radius-md); }
+.guide-reference-code h4 { color: #9 CDCDC; font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm); }
+.guide-reference-code pre { margin: 0; }
+.guide-reference-code code { color: #d4d4d4; font-family: 'Consolas', 'Monaco', monospace; font-size: var(--font-size-sm); white-space: pre-wrap; word-break: break-all; }
 </style>

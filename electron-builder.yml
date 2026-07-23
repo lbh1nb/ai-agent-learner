@@ -4,8 +4,8 @@ directories:
   buildResources: build
   output: release
 files:
-  - dist
-  - dist-electron
+  - app-dist
+  - app-electron
   - resources
 win:
   target:

@@ -1,6 +1,9 @@
 node_modules/
 dist/
 dist-electron/
+app-dist/
+app-electron/
+app-asar-check/
 dist-check/
 .electron-cache/
 user-data/
@@ -12,3 +15,6 @@ release/
 *.log
 init-error.log
 startup.log
+*.bak
+*.bak2
+/main.js
