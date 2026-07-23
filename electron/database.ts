@@ -40,10 +40,15 @@ export function initDatabase(): void {
 }
 
 function createTables(): void {
-  // 迁移：检查 tasks 表是否为旧结构（缺少 test_cases 列），如果是则删除以便重建
+  // 迁移：检查 tasks 表是否为旧结构（缺少 test_cases 列或 CHECK 约束不含 guide），如果是则删除以便重建
   try {
     const taskCols = db.prepare("PRAGMA table_info(tasks)").all() as any[]
-    if (taskCols.length > 0 && !taskCols.some(c => c.name === 'test_cases')) {
+    const taskTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='tasks'").get() as { sql: string } | undefined
+    const needsRebuild = taskCols.length > 0 && (
+      !taskCols.some(c => c.name === 'test_cases') ||
+      (taskTableSql && taskTableSql.sql && !taskTableSql.sql.includes("'guide'"))
+    )
+    if (needsRebuild) {
       db.exec('DROP TABLE tasks')
     }
   } catch (_) { /* 表不存在，忽略 */ }
@@ -155,7 +160,7 @@ function createTables(): void {
 
 // 种子数据版本号：每次修改 chapters/tasks/courses 种子内容时递增
 // 升级时若版本不匹配，会自动清除旧课程数据并重新填充，保留用户配置和学习时长
-const CURRENT_DATA_VERSION = '1.3.0'
+const CURRENT_DATA_VERSION = '1.3.1'
 
 function getDataVersion(): string | null {
   try {
